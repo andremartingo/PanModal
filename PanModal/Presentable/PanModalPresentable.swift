@@ -34,7 +34,8 @@ public protocol PanModalPresentable: AnyObject {
      Default value is the topLayoutGuide.length + 21.0.
      */
     var topOffset: CGFloat { get }
-
+    
+    
     /**
      The height of the pan modal container view
      when in the shortForm presentation state.
@@ -141,6 +142,8 @@ public protocol PanModalPresentable: AnyObject {
      Default value is true.
      */
     var allowsTapToDismiss: Bool { get }
+    
+    var backgroundInteraction: PanModalBackgroundInteraction { get }
 
     /**
      A flag to toggle user interactions on the container view.

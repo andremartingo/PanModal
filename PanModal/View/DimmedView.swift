@@ -30,21 +30,24 @@ public class DimmedView: UIView {
      */
     var dimState: DimState = .off {
         didSet {
-            switch dimState {
-            case .max:
-                alpha = 1.0
-            case .off:
-                alpha = 0.0
-            case .percent(let percentage):
-                alpha = max(0.0, min(1.0, percentage))
-            }
+            alpha = 0
         }
     }
 
     /**
      The closure to be executed when a tap occurs
      */
-    var didTap: ((_ recognizer: UIGestureRecognizer) -> Void)?
+    var didTap: ((_ recognizer: UIGestureRecognizer) -> Void)? {
+        didSet {
+            if self.didTap != nil {
+                addGestureRecognizer(tapGesture)
+            } else {
+                removeGestureRecognizer(tapGesture)
+            }
+        }
+    }
+    
+    var hitTestHandler: ((_ point: CGPoint, _ event: UIEvent?) -> UIView?)?
 
     /**
      Tap gesture recognizer
@@ -59,13 +62,16 @@ public class DimmedView: UIView {
         super.init(frame: .zero)
         alpha = 0.0
         backgroundColor = dimColor
-        addGestureRecognizer(tapGesture)
     }
 
     required public init?(coder aDecoder: NSCoder) {
         fatalError()
     }
-
+    
+    public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        return self.hitTestHandler?(point, event) ?? super.hitTest(point, with: event)
+    }
+    
     // MARK: - Event Handlers
 
     @objc private func didTapView() {

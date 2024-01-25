@@ -8,6 +8,22 @@
 #if os(iOS)
 import UIKit
 
+import Foundation
+
+/** Describes the user interaction events that are triggered as the user taps the background */
+public enum PanModalBackgroundInteraction: Equatable {
+
+    /** Taps dismiss the modal immediately */
+    case dismiss
+    
+    /** Touches are forwarded to the lower window (In most cases it would be the application main window that will handle it */
+    case forward
+    
+     /** Absorbs touches. The modal does nothing (Swallows the touch) */
+    case none
+    
+}
+
 /**
  The PanModalPresentationController is the middle layer between the presentingViewController
  and the presentedViewController.
@@ -111,14 +127,26 @@ open class PanModalPresentationController: UIPresentationController {
         } else {
             view = DimmedView()
         }
-        view.didTap = { [weak self] _ in
-            if self?.presentable?.allowsTapToDismiss == true {
-                self?.presentedViewController.dismiss(animated: true)
+        
+        if let backgroundInteraction = self.presentable?.backgroundInteraction {
+            switch backgroundInteraction {
+            case .forward:
+                view.hitTestHandler = { [weak self] (point, event) in
+                    return self?.presentingViewController.view.hitTest(point, with: event)
+                }
+                
+            case .dismiss:
+                view.didTap = { [weak self] _ in
+                    self?.presentedViewController.dismiss(animated: true)
+                }
+                
+            default:
+                break
             }
         }
         return view
     }()
-
+    
     /**
      A wrapper around the presented view so that we can modify
      the presented view apperance without changing

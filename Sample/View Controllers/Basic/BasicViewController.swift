@@ -33,4 +33,8 @@ extension BasicViewController: PanModalPresentable {
     var anchorModalToLongForm: Bool {
         return false
     }
+    
+    var backgroundInteraction: PanModalBackgroundInteraction {
+        return .forward
+    }
 }
